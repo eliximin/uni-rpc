@@ -50,7 +50,7 @@ pub async fn steamdaemon() -> Result<(), Box<dyn Error>> {
                 );
             }
         } else {
-            break;
+            continue;
         }
 
         println!("Status: {}", status);
@@ -96,19 +96,21 @@ pub async fn steamdaemon() -> Result<(), Box<dyn Error>> {
             println!("Inequal!")
         }
 
+        tokio::time::sleep(Duration::from_secs(rate)).await;
+
         match status {
             StatusCode::OK => {
                 println!("Proceed!");
             }
             _ => {
-                println!("Break.");
-                break;
+                println!("End of steam loop.");
+                continue;
             }
         }
-        tokio::time::sleep(Duration::from_secs(rate)).await;
+
     }
 
-    println!("Something stopped the loop. Check above?");
+    println!("Something stopped the loop. Check above?"); // Intentionally unreachable code, since the loop shouldn't stop by now
 
     Ok(())
 }
