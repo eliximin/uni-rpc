@@ -14,6 +14,7 @@ pub async fn lfmdaemon() -> Result<(), Box<dyn Error>> {
     dotenv().ok();
 
     let lastfm_api_key = env::var("LASTFM_API").expect("Missing LASTFM_API");
+    let lastfm_api_key = env::var("LASTFM_NAME").expect("Missing LASTFM_NAME");
 
     let client = reqwest::Client::builder()
         .user_agent("UniRPC-ALPHA/0.1 github/eliximin")
@@ -21,7 +22,7 @@ pub async fn lfmdaemon() -> Result<(), Box<dyn Error>> {
 
     loop {
         let url = format!(
-            "https://ws.audioscrobbler.com/2.0/?method=user.getRecentTracks&api_key={lastfm_api_key}&user=eliximinatus&format=json"
+            "https://ws.audioscrobbler.com/2.0/?method=user.getRecentTracks&api_key={lastfm_api_key}&user={lastfm_name}}&format=json"
         );
 
         let result = client.get(&url).send().await?;
