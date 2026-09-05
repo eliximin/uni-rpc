@@ -11,3 +11,5 @@ In short, it makes requests to APIs such as Steam's and Last.FM's, and perhaps m
 - Proper UI made in React.JS
 
 This project aims to be optimized and performant, using the least amount of resources possible. Eventually, everything will be configurable, including the API call rates, how assets are distributed, and more.
+
+Commit history was deleted because I reek at keeping my API keys safe.
