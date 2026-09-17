@@ -1,19 +1,17 @@
 extern crate dotenvy;
 
-use dotenvy::dotenv;
 use reqwest::{self, StatusCode};
 use scraper::{Html, Selector};
 use serde::Deserialize;
 use tokio::sync::mpsc;
 use std::boxed::Box;
-use std::env;
 use std::error::Error;
 use std::time::Duration;
 
 use crate::ipc_controller::ActivityMetadata;
 
 pub async fn steamdaemon(
-    tx: mpsc::Sender<ActivityMetadata>,
+    _tx: mpsc::Sender<ActivityMetadata>,
     steamid64: &str,
     apikey: &str,
 ) -> Result<(), Box<dyn Error>> {

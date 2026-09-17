@@ -2,14 +2,11 @@ extern crate discord_rich_presence;
 extern crate dotenvy;
 extern crate tokio;
 
-use discord_rich_presence::{DiscordIpc, DiscordIpcClient, activity, activity::Assets};
+use discord_rich_presence::DiscordIpc;
 use dotenvy::dotenv;
 use std::boxed::Box;
 use std::env;
 use std::error::Error;
-use std::ops::Deref;
-use std::thread;
-use std::time::Duration;
 use tokio::sync::mpsc;
 
 mod ipc_controller;
@@ -45,7 +42,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         }
     });
 
-    let lfm_tx = tx.clone();
+    let _lfm_tx = tx.clone();
 
     tokio::spawn(async {
         if let Err(e) = lfmdaemon().await {
