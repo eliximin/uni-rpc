@@ -104,7 +104,7 @@ pub async fn steamdaemon(
             println!("Inequal!")
         }
 
-        let state: ActivityMetadata = ActivityMetadata { name: game_name, details: None, state: unwrappeduser.gamedetails, large_image: None, large_text: None, large_url: None, small_image: None, small_text: None, small_url: None };
+        let state = ActivityMetadata { name: unwrappeduser.gamedetails, details: None, state: rich_presence, large_image: None, large_text: None, large_url: None, small_image: None, small_text: None, small_url: None };
 
         tx.send(state).await?;
 

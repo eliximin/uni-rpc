@@ -33,7 +33,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let _ = rpc_mgr.ensure_connected();
 
         while let Some(state) = rx.recv().await {
-            println!("received update: {:?}", state.details);
+            println!("received update: {:?}", state.name);
 
             if let Err(e) = rpc_mgr.update_presence(&state) {
                 eprintln!("ipc errored: {e}");

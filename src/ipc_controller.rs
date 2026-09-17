@@ -73,6 +73,10 @@ impl IPCManager {
 
         let mut payload = Activity::new();
 
+        /*if let Some(n) = &state.name {
+            payload = payload.name(n);
+        }*/
+
         if let Some(d) = &state.details {
             payload = payload.details(d);
         }
