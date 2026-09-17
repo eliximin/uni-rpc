@@ -3,10 +3,10 @@ extern crate dotenvy;
 use reqwest::{self, StatusCode};
 use scraper::{Html, Selector};
 use serde::Deserialize;
-use tokio::sync::mpsc;
 use std::boxed::Box;
 use std::error::Error;
 use std::time::Duration;
+use tokio::sync::mpsc;
 
 use crate::ipc_controller::ActivityMetadata;
 
@@ -16,9 +16,6 @@ pub async fn steamdaemon(
     apikey: &str,
 ) -> Result<(), Box<dyn Error>> {
     let rate = 10; // Every 10 seconds, makes a request. This is made to prevent rate limits because rate limits reek.
-
-
-
 
     let steamid3 = steamid64.parse::<u64>().unwrap() - 76561197960265728;
     println!("SteamID3: {}\nSteamID64: {}", steamid3, steamid64);
@@ -111,7 +108,6 @@ pub async fn steamdaemon(
                 continue;
             }
         }
-
     }
 
     println!("Something stopped the loop. Check above?"); // Intentionally unreachable code, since the loop shouldn't stop by now
