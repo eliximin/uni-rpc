@@ -55,7 +55,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let steam_tx = tx.clone();
 
     tokio::spawn(async {
-        if let Err(e) = steamdaemon(steam_tx.clone(), &steamid64, &steam_api_key).await {
+        if let Err(e) = steamdaemon(steam_tx, &steamid64, &steam_api_key).await {
             eprintln!("Oops: {:?}", e);
         }
     });
