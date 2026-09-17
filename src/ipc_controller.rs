@@ -2,6 +2,7 @@ extern crate discord_rich_presence;
 extern crate dotenvy;
 extern crate tokio;
 
+use discord_rich_presence::activity::ActivityType;
 use discord_rich_presence::{DiscordIpc, DiscordIpcClient, activity::Activity, activity::Assets};
 use dotenvy::dotenv;
 use std::boxed::Box;
@@ -20,6 +21,7 @@ pub fn setup() -> Result<(), Box<dyn Error>> {
 
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct ActivityMetadata {
+    pub activity_type: Option<IpcType>,
     pub name: Option<String>, // App title
     pub details: Option<String>,
     pub state: Option<String>,
@@ -29,6 +31,26 @@ pub struct ActivityMetadata {
     pub small_image: Option<String>,
     pub small_text: Option<String>, // Also hover
     pub small_url: Option<String>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
+pub enum IpcType {
+    Playing = 0,
+    Listening = 1,
+    Watching = 2,
+    Competing = 3,
+} // i have to test these to confirm these are accurate
+impl From<IpcType> for ActivityType {
+    fn from(ipc_type: IpcType) -> Self {
+        match ipc_type {
+            IpcType::Playing => ActivityType::Playing,
+            IpcType::Listening => ActivityType::Listening,
+            IpcType::Watching => ActivityType::Watching,
+            IpcType::Competing => ActivityType::Competing,
+            _ => ActivityType::Playing
+        }
+    }
 }
 
 impl ActivityMetadata {
@@ -84,6 +106,11 @@ impl IPCManager {
         if let Some(s) = &state.state {
             payload = payload.state(s);
         }
+
+        if let Some(a) = &state.activity_type {
+            payload = payload.activity_type((*a).into());
+        }
+
 
         if state.has_assets() {
             let mut assets = Assets::new();
