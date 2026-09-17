@@ -14,6 +14,7 @@ pub async fn steamdaemon(
     tx: mpsc::Sender<ActivityMetadata>,
     steamid64: &str,
     apikey: &str,
+    griddbapi: &str,
 ) -> Result<(), Box<dyn Error>> {
     let rate = 10; // Every 10 seconds, makes a request. This is made to prevent rate limits because rate limits reek.
 
@@ -65,11 +66,19 @@ pub async fn steamdaemon(
         println!("RPC Status: {}", rpcfetch.status());
         let rpcbody = rpcfetch.text().await?;
 
-        let (game_name, rich_presence): (Option<String>, Option<String>) = {
+        let (game_name, rich_presence, large_image_url): (Option<String>, Option<String>, Option<String>) = {
             let document = Html::parse_document(&rpcbody);
 
             let game_sel = Selector::parse("span.miniprofile_game_name").ok();
             let rp_sel = Selector::parse("span.rich_presence").ok();
+            let icon_sel = Selector::parse("div.miniprofile_game_icon img").ok();
+
+            let icon_url = icon_sel.and_then(|sel| {
+                document.select(&sel)
+                    .next()
+                    .and_then(|img| img.value().attr("src"))
+                    .map(|src| src.to_string())
+            });
 
             let game = game_sel
                 .and_then(|sel| {
@@ -93,8 +102,9 @@ pub async fn steamdaemon(
 
 
 
-            (game, rp)
+            (game, rp, icon_url)
         };
+
 
 
 
@@ -104,7 +114,7 @@ pub async fn steamdaemon(
             println!("Inequal!")
         }
 
-        let state = ActivityMetadata { name: unwrappeduser.gamedetails, details: None, state: rich_presence, large_image: None, large_text: None, large_url: None, small_image: None, small_text: None, small_url: None };
+        let state = ActivityMetadata { name: unwrappeduser.gamedetails, details: Some("using uni-rpc by eli".into()), state: rich_presence, large_image: large_image_url, large_text: None, large_url: None, small_image: None, small_text: None, small_url: None };
 
         tx.send(state).await?;
 

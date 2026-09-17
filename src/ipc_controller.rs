@@ -54,6 +54,7 @@ impl IPCManager {
     }
 
     pub fn ensure_connected(&mut self) -> Result<&mut DiscordIpcClient, Box<dyn Error>> {
+
         if self.client.is_none() {
             let mut client = DiscordIpcClient::new(&self.app_id);
             client.connect()?;
@@ -73,9 +74,9 @@ impl IPCManager {
 
         let mut payload = Activity::new();
 
-        /*if let Some(n) = &state.name {
+        if let Some(n) = &state.name {
             payload = payload.name(n);
-        }*/
+        }
 
         if let Some(d) = &state.details {
             payload = payload.details(d);

@@ -22,10 +22,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let steam_api_key = env::var("STEAM_API").expect("Missing STEAM_API");
     let steamid64 = env::var("STEAMID64").expect("Missing STEAMID64");
-
+    let gridapi = env::var("GRIDDB_API").expect("Missing GRIDDB_API");
     let appid = env::var("APP_ID").expect("Missing APP_ID");
 
     let (tx, mut rx) = mpsc::channel::<ActivityMetadata>(32);
+
+
 
     tokio::spawn(async move {
         let mut rpc_mgr = ipc_controller::IPCManager::new(&appid);
@@ -54,9 +56,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let steamid = steamid64.clone();
     let steamapikey = steam_api_key.clone();
+    let griddbapi = gridapi;
 
     tokio::spawn(async move {
-        if let Err(e) = steamdaemon(steam_tx, &steamid, &steamapikey).await {
+        if let Err(e) = steamdaemon(steam_tx, &steamid, &steamapikey, &griddbapi).await {
             eprintln!("Oops: {:?}", e);
         }
     });
