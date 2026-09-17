@@ -19,7 +19,7 @@ pub async fn steamdaemon(
 ) -> Result<(), Box<dyn Error>> {
     let rate = 10; // Every 10 seconds, makes a request. This is made to prevent rate limits because rate limits reek.
 
-    dotenv().ok();
+
 
 
     let steamid3 = steamid64.parse::<u64>().unwrap() - 76561197960265728;
@@ -31,7 +31,7 @@ pub async fn steamdaemon(
 
     loop {
         let url = format!(
-            "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={steam_api_key}&steamids={steamid64}"
+            "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={apikey}&steamids={steamid64}"
         );
 
         let result = client.get(&url).send().await?;
