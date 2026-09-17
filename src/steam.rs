@@ -3,12 +3,18 @@ extern crate dotenvy;
 use reqwest::{self, StatusCode};
 use scraper::{Html, Selector};
 use serde::Deserialize;
+use serde_json::Number;
 use std::boxed::Box;
 use std::error::Error;
 use std::time::Duration;
 use tokio::sync::mpsc;
 
 use crate::ipc_controller::ActivityMetadata;
+
+use reqwest::header;
+
+
+
 
 pub async fn steamdaemon(
     tx: mpsc::Sender<ActivityMetadata>,
@@ -18,11 +24,18 @@ pub async fn steamdaemon(
 ) -> Result<(), Box<dyn Error>> {
     let rate = 10; // Every 10 seconds, makes a request. This is made to prevent rate limits because rate limits reek.
 
+    let mut headers = header::HeaderMap::new();
+
+    let mut auth_value = header::HeaderValue::from_str(&format!("Bearer {griddbapi}"))?;
+    auth_value.set_sensitive(true);
+    headers.insert(header::AUTHORIZATION, auth_value);
+
     let steamid3 = steamid64.parse::<u64>().unwrap() - 76561197960265728;
     println!("SteamID3: {}\nSteamID64: {}", steamid3, steamid64);
 
     let client = reqwest::Client::builder()
         .user_agent("UniRPC-ALPHA/0.1 github/eliximin") // As demanded by... well, literally every single endpoint. Makes the client recognizable
+        .default_headers(headers)
         .build()?;
 
     loop {
@@ -105,7 +118,13 @@ pub async fn steamdaemon(
             (game, rp, icon_url)
         };
 
+        let gameid = unwrappeduser.gameid.clone();
 
+        let dburl = format!(
+            "https://www.steamgriddb.com/api/v2/grids/steam/{gameid}"
+        );
+
+        let dbresult = client.get(&dburl).send().await?;
 
 
         println!("RPC: {:?}", rich_presence);
@@ -165,4 +184,25 @@ impl Player {
     pub fn is_in_game(&self) -> bool {
         self.gamedetails.is_some() // Checks if in game
     }
+}
+
+
+// griddb
+#[derive(Deserialize, Debug)]
+pub struct GridDBResponse {
+    pub success: bool,
+    pub page: Number,
+    pub total: Number,
+    pub limit: Number,
+    pub data: Data
+}
+
+#[derive(Deserialize, Debug)]
+pub struct Data {
+    #[serde(rename = "players")]
+    pub id: Number,
+    pub score: Number,
+    pub style: Number,
+    pub url: String,
+    pub thumb: String,
 }
