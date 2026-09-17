@@ -9,7 +9,7 @@ use std::error::Error;
 use std::time::Duration;
 use tokio::sync::mpsc;
 
-use crate::ipc_controller::ActivityMetadata;
+use crate::ipc_controller::{ActivityMetadata, IpcType};
 
 use reqwest::header;
 
@@ -138,7 +138,7 @@ pub async fn steamdaemon(
 
         let grid = dbdata
             .data
-            .get(0)
+            .get(1)
             .cloned();
 
         let large_img_url = grid.unwrap().url;
@@ -149,7 +149,7 @@ pub async fn steamdaemon(
             println!("Inequal!")
         }
 
-        let state = ActivityMetadata { name: unwrappeduser.gamedetails, details: Some("using uni-rpc by eli".into()), state: rich_presence, large_image: large_img_url, large_text: None, large_url: None, small_image: None, small_text: None, small_url: None };
+        let state = ActivityMetadata { activity_type: Some(IpcType::Playing), name: unwrappeduser.gamedetails, details: Some("using uni-rpc by eli".into()), state: rich_presence, large_image: large_img_url, large_text: None, large_url: None, small_image: None, small_text: None, small_url: None };
 
         tx.send(state).await?;
 
