@@ -11,7 +11,7 @@ use tokio::sync::mpsc;
 use crate::ipc_controller::ActivityMetadata;
 
 pub async fn steamdaemon(
-    _tx: mpsc::Sender<ActivityMetadata>,
+    tx: mpsc::Sender<ActivityMetadata>,
     steamid64: &str,
     apikey: &str,
 ) -> Result<(), Box<dyn Error>> {
@@ -25,14 +25,14 @@ pub async fn steamdaemon(
         .build()?;
 
     loop {
-        let url = format!(
+        let steamurl = format!(
             "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={apikey}&steamids={steamid64}"
         );
 
-        let result = client.get(&url).send().await?;
+        let steamresult = client.get(&steamurl).send().await?;
 
-        let status = result.status();
-        let data: SteamResponse = result.json().await?;
+        let status = steamresult.status();
+        let data: SteamResponse = steamresult.json().await?;
 
         let steamuser = data
             .response
@@ -53,6 +53,9 @@ pub async fn steamdaemon(
         } else {
             continue;
         }
+
+        let unwrappeduser = steamuser.unwrap();
+        //let gameid = unwrappeduser.gameid;
 
         println!("Status: {}", status);
 
@@ -88,14 +91,22 @@ pub async fn steamdaemon(
                 .map(|s| s.trim().to_string())
                 .filter(|s| !s.is_empty());
 
+
+
             (game, rp)
         };
 
+
+
         println!("RPC: {:?}", rich_presence);
 
-        if game_name != steamuser.unwrap().gamedetails {
+        if game_name != unwrappeduser.gamedetails {
             println!("Inequal!")
         }
+
+        let state: ActivityMetadata = ActivityMetadata { name: game_name, details: None, state: unwrappeduser.gamedetails, large_image: None, large_text: None, large_url: None, small_image: None, small_text: None, small_url: None };
+
+        tx.send(state).await?;
 
         tokio::time::sleep(Duration::from_secs(rate)).await;
 
@@ -105,7 +116,7 @@ pub async fn steamdaemon(
             }
             _ => {
                 println!("End of steam loop.");
-                continue;
+                break;
             }
         }
     }
