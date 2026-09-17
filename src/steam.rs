@@ -40,10 +40,17 @@ pub async fn steamdaemon(
 
     loop {
         let steamurl = format!(
-            "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={apikey}&steamids={steamid64}"
+            "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/"
         );
 
-        let steamresult = client.get(&steamurl).send().await?;
+        let steamresult = client
+            .get(&steamurl)
+            .query(&(
+                ("key", apikey),
+                ("steamids", steamid64)
+            ))
+            .send()
+            .await?;
 
         let status = steamresult.status();
         let data: SteamResponse = steamresult.json().await?;
@@ -79,19 +86,13 @@ pub async fn steamdaemon(
         println!("RPC Status: {}", rpcfetch.status());
         let rpcbody = rpcfetch.text().await?;
 
-        let (game_name, rich_presence, large_image_url): (Option<String>, Option<String>, Option<String>) = {
+        let (game_name, rich_presence): (Option<String>, Option<String>) = {
             let document = Html::parse_document(&rpcbody);
 
             let game_sel = Selector::parse("span.miniprofile_game_name").ok();
             let rp_sel = Selector::parse("span.rich_presence").ok();
-            let icon_sel = Selector::parse("div.miniprofile_game_icon img").ok();
 
-            let icon_url = icon_sel.and_then(|sel| {
-                document.select(&sel)
-                    .next()
-                    .and_then(|img| img.value().attr("src"))
-                    .map(|src| src.to_string())
-            });
+
 
             let game = game_sel
                 .and_then(|sel| {
@@ -115,7 +116,7 @@ pub async fn steamdaemon(
 
 
 
-            (game, rp, icon_url)
+            (game, rp)
         };
 
         let gameid = unwrappeduser.gameid.clone();
@@ -124,8 +125,23 @@ pub async fn steamdaemon(
             "https://www.steamgriddb.com/api/v2/grids/steam/{gameid}"
         );
 
-        let dbresult = client.get(&dburl).send().await?;
+        let dbresult = client
+            .get(&dburl)
+            .query(&[
+                ("dimensions", "1024x1024,512x512")
+            ])
+            .send()
+            .await?;
+        let dbstatus = dbresult.status();
+        println!("Status {}", dbstatus);
+        let dbdata: GridDBResponse = dbresult.json().await?;
 
+        let grid = dbdata
+            .data
+            .get(0)
+            .cloned();
+
+        let large_img_url = grid.unwrap().url;
 
         println!("RPC: {:?}", rich_presence);
 
@@ -133,7 +149,7 @@ pub async fn steamdaemon(
             println!("Inequal!")
         }
 
-        let state = ActivityMetadata { name: unwrappeduser.gamedetails, details: Some("using uni-rpc by eli".into()), state: rich_presence, large_image: large_image_url, large_text: None, large_url: None, small_image: None, small_text: None, small_url: None };
+        let state = ActivityMetadata { name: unwrappeduser.gamedetails, details: Some("using uni-rpc by eli".into()), state: rich_presence, large_image: large_img_url, large_text: None, large_url: None, small_image: None, small_text: None, small_url: None };
 
         tx.send(state).await?;
 
@@ -194,15 +210,14 @@ pub struct GridDBResponse {
     pub page: Number,
     pub total: Number,
     pub limit: Number,
-    pub data: Data
+    pub data: Vec<Data>
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct Data {
-    #[serde(rename = "players")]
     pub id: Number,
     pub score: Number,
-    pub style: Number,
-    pub url: String,
+    pub style: String,
+    pub url: Option<String>,
     pub thumb: String,
 }
