@@ -7,6 +7,7 @@ use dotenvy::dotenv;
 use std::boxed::Box;
 use std::env;
 use std::error::Error;
+use std::ops::Deref;
 use std::thread;
 use std::time::Duration;
 use tokio::sync::mpsc;
@@ -54,17 +55,16 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let steam_tx = tx.clone();
 
-    tokio::spawn(async {
-        if let Err(e) = steamdaemon(steam_tx, &steamid64, &steam_api_key).await {
+    let steamid = steamid64.clone();
+    let steamapikey = steam_api_key.clone();
+
+    tokio::spawn(async move {
+        if let Err(e) = steamdaemon(steam_tx, &steamid, &steamapikey).await {
             eprintln!("Oops: {:?}", e);
         }
     });
 
     // Due for a large refactor, honestly... I'll have to use startdaemon to supply this main script with assets and such. I'll branch the actual RPC module into a different script later.
-
-    loop {
-        thread::sleep(Duration::from_secs(10));
-    }
 
     tokio::signal::ctrl_c().await?;
     println!("shutdown");
