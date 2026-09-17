@@ -46,6 +46,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             }
         }
     });
+    /*
 
     let lfm_tx = tx.clone();
 
@@ -53,9 +54,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
         if let Err(e) = lfmdaemon(lfm_tx, &lastfm_name, &lastfm_api_key).await {
             eprintln!("Oops: {:?}", e);
         }
-    });
+    });*/
 
-/*
     let steam_tx = tx.clone();
 
     let steamid = steamid64.clone();
@@ -66,7 +66,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         if let Err(e) = steamdaemon(steam_tx, &steamid, &steamapikey, &griddbapi).await {
             eprintln!("Oops: {:?}", e);
         }
-    });*/
+    });
     // Due for a large refactor, honestly... I'll have to use startdaemon to supply this main script with assets and such. I'll branch the actual RPC module into a different script later.
 
     tokio::signal::ctrl_c().await?;
