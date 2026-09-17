@@ -53,7 +53,7 @@ impl IPCManager {
         }
     }
 
-    fn ensure_connected(&mut self) -> Result<&mut DiscordIpcClient, Box<dyn Error>> {
+    pub fn ensure_connected(&mut self) -> Result<&mut DiscordIpcClient, Box<dyn Error>> {
         if self.client.is_none() {
             let mut client = DiscordIpcClient::new(&self.app_id);
             client.connect()?;

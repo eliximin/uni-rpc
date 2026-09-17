@@ -4,18 +4,24 @@ use dotenvy::dotenv;
 use reqwest::{self, StatusCode};
 use scraper::{Html, Selector};
 use serde::Deserialize;
+use tokio::sync::mpsc;
 use std::boxed::Box;
 use std::env;
 use std::error::Error;
 use std::time::Duration;
 
-pub async fn steamdaemon() -> Result<(), Box<dyn Error>> {
+use crate::ipc_controller::ActivityMetadata;
+
+pub async fn steamdaemon(
+    tx: mpsc::Sender<ActivityMetadata>,
+    steamid64: &str,
+    apikey: &str,
+) -> Result<(), Box<dyn Error>> {
     let rate = 10; // Every 10 seconds, makes a request. This is made to prevent rate limits because rate limits reek.
 
     dotenv().ok();
 
-    let steam_api_key = env::var("STEAM_API").expect("Missing STEAM_API");
-    let steamid64 = env::var("STEAMID64").expect("Missing STEAMID64");
+
     let steamid3 = steamid64.parse::<u64>().unwrap() - 76561197960265728;
     println!("SteamID3: {}\nSteamID64: {}", steamid3, steamid64);
 
