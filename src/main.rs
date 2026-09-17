@@ -19,11 +19,14 @@ use crate::steam::steamdaemon;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     dotenv().ok();
+    let appid = env::var("APP_ID").expect("Missing APP_ID");
 
     let steam_api_key = env::var("STEAM_API").expect("Missing STEAM_API");
     let steamid64 = env::var("STEAMID64").expect("Missing STEAMID64");
     let gridapi = env::var("GRIDDB_API").expect("Missing GRIDDB_API");
-    let appid = env::var("APP_ID").expect("Missing APP_ID");
+
+    let lastfm_api_key = env::var("LASTFM_API").expect("Missing LASTFM_API");
+    let lastfm_name = env::var("LASTFM_NAME").expect("Missing LASTFM_NAME");
 
     let (tx, mut rx) = mpsc::channel::<ActivityMetadata>(32);
 
@@ -44,14 +47,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
         }
     });
 
-    let _lfm_tx = tx.clone();
+    let lfm_tx = tx.clone();
 
-    tokio::spawn(async {
-        if let Err(e) = lfmdaemon().await {
+    tokio::spawn(async move {
+        if let Err(e) = lfmdaemon(lfm_tx, &lastfm_name, &lastfm_api_key).await {
             eprintln!("Oops: {:?}", e);
         }
     });
 
+/*
     let steam_tx = tx.clone();
 
     let steamid = steamid64.clone();
@@ -62,8 +66,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         if let Err(e) = steamdaemon(steam_tx, &steamid, &steamapikey, &griddbapi).await {
             eprintln!("Oops: {:?}", e);
         }
-    });
-
+    });*/
     // Due for a large refactor, honestly... I'll have to use startdaemon to supply this main script with assets and such. I'll branch the actual RPC module into a different script later.
 
     tokio::signal::ctrl_c().await?;
