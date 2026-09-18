@@ -122,14 +122,11 @@ pub async fn steamdaemon(
         let gameid = unwrappeduser.gameid.clone();
 
         let dburl = format!(
-            "https://www.steamgriddb.com/api/v2/grids/steam/{gameid}"
+            "https://www.steamgriddb.com/api/v2/icons/steam/{gameid}"
         );
 
         let dbresult = client
             .get(&dburl)
-            .query(&[
-                ("dimensions", "1024x1024,512x512")
-            ])
             .send()
             .await?;
         let dbstatus = dbresult.status();
@@ -161,7 +158,7 @@ pub async fn steamdaemon(
             }
             _ => {
                 println!("End of steam loop.");
-                break;
+                continue;
             }
         }
     }
