@@ -38,7 +38,7 @@ pub async fn lfmdaemon(
         let first_track = data.recenttracks.track.first();
 
         if let Some(track) = first_track
-            && first_track.clone().unwrap().is_now_playing()
+            && first_track.unwrap().is_now_playing()
         {
             println!("Playing {:?} by {:?}", track.name, track.artist.name);
             println!("Album is {}", track.album.name);

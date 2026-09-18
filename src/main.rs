@@ -13,7 +13,6 @@ mod ipc_controller;
 mod lastfm;
 mod steam;
 use crate::ipc_controller::ActivityMetadata;
-use crate::lastfm::lfmdaemon;
 use crate::steam::steamdaemon;
 
 #[tokio::main]
@@ -25,8 +24,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let steamid64 = env::var("STEAMID64").expect("Missing STEAMID64");
     let gridapi = env::var("GRIDDB_API").expect("Missing GRIDDB_API");
 
-    let lastfm_api_key = env::var("LASTFM_API").expect("Missing LASTFM_API");
-    let lastfm_name = env::var("LASTFM_NAME").expect("Missing LASTFM_NAME");
+    let _lastfm_api_key = env::var("LASTFM_API").expect("Missing LASTFM_API");
+    let _lastfm_name = env::var("LASTFM_NAME").expect("Missing LASTFM_NAME");
 
     let (tx, mut rx) = mpsc::channel::<ActivityMetadata>(32);
 
