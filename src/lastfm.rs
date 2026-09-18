@@ -19,14 +19,11 @@ pub async fn lfmdaemon(
 
     dotenv().ok();
 
-
-
     let client = reqwest::Client::builder()
         .user_agent("UniRPC-ALPHA/0.1 github/eliximin")
         .build()?;
 
     loop {
-
         tokio::time::sleep(Duration::from_secs(rate)).await;
 
         let url = format!(
@@ -43,35 +40,38 @@ pub async fn lfmdaemon(
         if let Some(track) = first_track
             && first_track.clone().unwrap().is_now_playing()
         {
-            println!(
-                "Playing {:?} by {:?}",
-                track.name, track.artist.name
-            );
+            println!("Playing {:?} by {:?}", track.name, track.artist.name);
             println!("Album is {}", track.album.name);
-
-        }
-        else {
-            continue
+        } else {
+            continue;
         }
 
         let current_track = first_track.unwrap();
 
-        let large_image_url = current_track.image
+        let large_image_url = current_track
+            .image
             .iter()
             .find(|img| img.size == "extralarge")
             .or_else(|| current_track.image.iter().find(|img| img.size == "large"))
             .or_else(|| current_track.image.first())
             .map(|img| &img.url);
 
-        let state = ActivityMetadata { activity_type: Some(IpcType::Listening), name: Some(current_track.artist.name.clone()), details: current_track.name.clone(), state: Some(current_track.artist.name.clone()), large_image: large_image_url.cloned(), large_text: Some(current_track.album.name.clone()), large_url: current_track.url.clone(), small_image: None, small_text: None, small_url: None };
+        let state = ActivityMetadata {
+            activity_type: Some(IpcType::Listening),
+            name: Some(current_track.artist.name.clone()),
+            details: current_track.name.clone(),
+            state: Some(current_track.artist.name.clone()),
+            large_image: large_image_url.cloned(),
+            large_text: Some(current_track.album.name.clone()),
+            large_url: current_track.url.clone(),
+            small_image: None,
+            small_text: None,
+            small_url: None,
+        };
 
         println!("Status: {}", status);
 
-
-
         tx.send(state).await?;
-
-
 
         match status {
             StatusCode::OK => {

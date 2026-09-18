@@ -13,9 +13,6 @@ use crate::ipc_controller::{ActivityMetadata, IpcType};
 
 use reqwest::header;
 
-
-
-
 pub async fn steamdaemon(
     tx: mpsc::Sender<ActivityMetadata>,
     steamid64: &str,
@@ -39,16 +36,11 @@ pub async fn steamdaemon(
         .build()?;
 
     loop {
-        let steamurl = format!(
-            "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/"
-        );
+        let steamurl = format!("https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/");
 
         let steamresult = client
             .get(&steamurl)
-            .query(&(
-                ("key", apikey),
-                ("steamids", steamid64)
-            ))
+            .query(&(("key", apikey), ("steamids", steamid64)))
             .send()
             .await?;
 
@@ -92,8 +84,6 @@ pub async fn steamdaemon(
             let game_sel = Selector::parse("span.miniprofile_game_name").ok();
             let rp_sel = Selector::parse("span.rich_presence").ok();
 
-
-
             let game = game_sel
                 .and_then(|sel| {
                     document
@@ -114,29 +104,19 @@ pub async fn steamdaemon(
                 .map(|s| s.trim().to_string())
                 .filter(|s| !s.is_empty());
 
-
-
             (game, rp)
         };
 
         let gameid = unwrappeduser.gameid.clone();
 
-        let dburl = format!(
-            "https://www.steamgriddb.com/api/v2/icons/steam/{gameid}"
-        );
+        let dburl = format!("https://www.steamgriddb.com/api/v2/icons/steam/{gameid}");
 
-        let dbresult = client
-            .get(&dburl)
-            .send()
-            .await?;
+        let dbresult = client.get(&dburl).send().await?;
         let dbstatus = dbresult.status();
         println!("Status {}", dbstatus);
         let dbdata: GridDBResponse = dbresult.json().await?;
 
-        let grid = dbdata
-            .data
-            .get(1)
-            .cloned();
+        let grid = dbdata.data.get(1).cloned();
 
         let large_img_url = grid.unwrap().url;
 
@@ -146,7 +126,18 @@ pub async fn steamdaemon(
             println!("Inequal!")
         }
 
-        let state = ActivityMetadata { activity_type: Some(IpcType::Playing), name: unwrappeduser.gamedetails, details: None, state: rich_presence, large_image: large_img_url, large_text: None, large_url: None, small_image: None, small_text: None, small_url: None };
+        let state = ActivityMetadata {
+            activity_type: Some(IpcType::Playing),
+            name: unwrappeduser.gamedetails,
+            details: None,
+            state: rich_presence,
+            large_image: large_img_url,
+            large_text: None,
+            large_url: None,
+            small_image: None,
+            small_text: None,
+            small_url: None,
+        };
 
         tx.send(state).await?;
 
@@ -199,7 +190,6 @@ impl Player {
     }
 }
 
-
 // griddb
 #[derive(Deserialize, Debug)]
 pub struct GridDBResponse {
@@ -207,7 +197,7 @@ pub struct GridDBResponse {
     pub page: Number,
     pub total: Number,
     pub limit: Number,
-    pub data: Vec<Data>
+    pub data: Vec<Data>,
 }
 
 #[derive(Deserialize, Debug, Clone)]

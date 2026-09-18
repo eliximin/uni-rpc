@@ -6,6 +6,7 @@ use discord_rich_presence::activity::ActivityType;
 use discord_rich_presence::{DiscordIpc, DiscordIpcClient, activity::Activity, activity::Assets};
 use dotenvy::dotenv;
 use std::boxed::Box;
+use std::path
 use std::env;
 use std::error::Error;
 
