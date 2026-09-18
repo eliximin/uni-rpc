@@ -149,7 +149,7 @@ pub async fn steamdaemon(
             println!("Inequal!")
         }
 
-        let state = ActivityMetadata { activity_type: Some(IpcType::Playing), name: unwrappeduser.gamedetails, details: Some("using uni-rpc by eli".into()), state: rich_presence, large_image: large_img_url, large_text: None, large_url: None, small_image: None, small_text: None, small_url: None };
+        let state = ActivityMetadata { activity_type: Some(IpcType::Playing), name: unwrappeduser.gamedetails, details: None, state: rich_presence, large_image: large_img_url, large_text: None, large_url: None, small_image: None, small_text: None, small_url: None };
 
         tx.send(state).await?;
 
