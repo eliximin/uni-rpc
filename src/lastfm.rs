@@ -24,8 +24,6 @@ pub async fn lfmdaemon(
         .build()?;
 
     loop {
-
-
         let url = format!(
             "https://ws.audioscrobbler.com/2.0/?method=user.getRecentTracks&api_key={lastfm_api_key}&user={lastfm_name}&format=json"
         );
