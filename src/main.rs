@@ -2,13 +2,13 @@ extern crate discord_rich_presence;
 extern crate dotenvy;
 extern crate tokio;
 
-use discord_rich_presence::DiscordIpc;
 use dotenvy::dotenv;
 use std::boxed::Box;
 use std::env;
 use std::error::Error;
 use tokio::sync::mpsc;
 
+mod config;
 mod ipc_controller;
 mod lastfm;
 mod steam;
@@ -18,14 +18,17 @@ use crate::steam::steamdaemon;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     dotenv().ok();
-    let appid = env::var("APP_ID").expect("Missing APP_ID");
+    // let appid = env::var("APP_ID").expect("Missing APP_ID");
 
-    let steam_api_key = env::var("STEAM_API").expect("Missing STEAM_API");
-    let steamid64 = env::var("STEAMID64").expect("Missing STEAMID64");
-    let gridapi = env::var("GRIDDB_API").expect("Missing GRIDDB_API");
 
-    let _lastfm_api_key = env::var("LASTFM_API").expect("Missing LASTFM_API");
-    let _lastfm_name = env::var("LASTFM_NAME").expect("Missing LASTFM_NAME");
+    let (_lastfm_api_key, steam_api_key, griddb_api_key) = config::please_speed_i_need_keys()?;
+    let (appid, _lastfm_name, steamid64) = config::get_info()?;
+
+    // let steam_api_key = env::var("STEAM_API").expect("Missing STEAM_API");
+    // let steamid64 = env::var("STEAMID64").expect("Missing STEAMID64");
+    // let gridapi = env::var("GRIDDB_API").expect("Missing GRIDDB_API");
+
+    // let _lastfm_name = env::var("LASTFM_NAME").expect("Missing LASTFM_NAME");
 
     let (tx, mut rx) = mpsc::channel::<ActivityMetadata>(32);
 
@@ -57,7 +60,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let steamid = steamid64.clone();
     let steamapikey = steam_api_key.clone();
-    let griddbapi = gridapi;
+    let griddbapi = griddb_api_key;
 
     tokio::spawn(async move {
         if let Err(e) = steamdaemon(steam_tx, &steamid, &steamapikey, &griddbapi).await {
