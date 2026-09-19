@@ -24,7 +24,7 @@ pub async fn lfmdaemon(
         .build()?;
 
     loop {
-        tokio::time::sleep(Duration::from_secs(rate)).await;
+
 
         let url = format!(
             "https://ws.audioscrobbler.com/2.0/?method=user.getRecentTracks&api_key={lastfm_api_key}&user={lastfm_name}&format=json"
@@ -72,6 +72,8 @@ pub async fn lfmdaemon(
         println!("Status: {}", status);
 
         tx.send(state).await?;
+
+        tokio::time::sleep(Duration::from_secs(rate)).await;
 
         match status {
             StatusCode::OK => {
