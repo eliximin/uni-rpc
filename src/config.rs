@@ -37,7 +37,7 @@ pub fn get_secret(key_name: &str) -> Option<String> {
     }
 }
 
-pub fn get_info() -> Result<(String, String, String), Box<dyn std::error::Error>> {
+pub fn get_info() -> Result<(String, String, String, String), Box<dyn std::error::Error>> {
     let appid = Password::new("Discord App ID")
         .with_display_mode(PasswordDisplayMode::Masked)
         .with_help_message(
@@ -45,13 +45,20 @@ pub fn get_info() -> Result<(String, String, String), Box<dyn std::error::Error>
         )
         .prompt()?;
 
+    let current_session =
+        Select::new("LastFM or Steam?", vec!["LastFM", "Steam"])
+            .with_help_message("I'm too lazy to actually stop you from filling out either of those fields, so just don't fill out Steam-related ones if you pick LastFM. And vice-versa.")
+            .prompt()?;
+
     let lfm_name = Text::new("What's your name on LastFM?").prompt()?;
 
     let steamid64 = Text::new("What's your SteamID64?")
         .with_help_message("Use https://steamid.io/ to get it.")
         .prompt()?;
 
-    Ok((appid, lfm_name, steamid64))
+
+
+    Ok((appid, lfm_name, steamid64, current_session.to_string()))
 }
 
 pub fn please_speed_i_need_keys() -> Result<(String, String, String), Box<dyn std::error::Error>> {

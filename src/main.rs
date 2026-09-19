@@ -5,6 +5,7 @@ extern crate tokio;
 use dotenvy::dotenv;
 use std::boxed::Box;
 use std::error::Error;
+use std::thread::current;
 use tokio::sync::mpsc;
 
 mod config;
@@ -13,14 +14,15 @@ mod lastfm;
 mod steam;
 use crate::ipc_controller::ActivityMetadata;
 use crate::steam::steamdaemon;
+use crate::lastfm::lfmdaemon;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     dotenv().ok();
     // let appid = env::var("APP_ID").expect("Missing APP_ID");
 
-    let (_lastfm_api_key, steam_api_key, griddb_api_key) = config::please_speed_i_need_keys()?;
-    let (appid, _lastfm_name, steamid64) = config::get_info()?;
+    let (lastfm_api_key, steam_api_key, griddb_api_key) = config::please_speed_i_need_keys()?;
+    let (appid, lastfm_name, steamid64, current_session) = config::get_info()?;
 
     // let steam_api_key = env::var("STEAM_API").expect("Missing STEAM_API");
     // let steamid64 = env::var("STEAMID64").expect("Missing STEAMID64");
@@ -44,27 +46,37 @@ async fn main() -> Result<(), Box<dyn Error>> {
             }
         }
     });
-    /*
+    if current_session == "LastFM" {
+        println!("Running in LastFM mode!");
+        let lfm_tx = tx.clone();
 
-    let lfm_tx = tx.clone();
+        let lastfm_name = lastfm_name.clone();
+        let lastfm_api_key = lastfm_api_key.clone();
 
-    tokio::spawn(async move {
-        if let Err(e) = lfmdaemon(lfm_tx, &lastfm_name, &lastfm_api_key).await {
-            eprintln!("Oops: {:?}", e);
-        }
-    });*/
+        tokio::spawn(async move {
+            println!("Luh fm");
+            if let Err(e) = lfmdaemon(lfm_tx, &lastfm_name, &lastfm_api_key).await {
+                eprintln!("Oops: {:?}", e);
+            }
+        });
+    }
 
-    let steam_tx = tx.clone();
+    if current_session == "Steam" {
+        println!("Running in Steam mode!");
+        let steam_tx = tx.clone();
 
-    let steamid = steamid64.clone();
-    let steamapikey = steam_api_key.clone();
-    let griddbapi = griddb_api_key;
+        let steamid = steamid64.clone();
+        let steamapikey = steam_api_key.clone();
+        let griddbapi = griddb_api_key;
 
-    tokio::spawn(async move {
-        if let Err(e) = steamdaemon(steam_tx, &steamid, &steamapikey, &griddbapi).await {
-            eprintln!("Oops: {:?}", e);
-        }
-    });
+        tokio::spawn(async move {
+            if let Err(e) = steamdaemon(steam_tx, &steamid, &steamapikey, &griddbapi).await {
+                eprintln!("Oops: {:?}", e);
+            }
+        });
+    }
+
+
     // Due for a large refactor, honestly... I'll have to use startdaemon to supply this main script with assets and such. I'll branch the actual RPC module into a different script later.
 
     tokio::signal::ctrl_c().await?;
