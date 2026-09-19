@@ -63,7 +63,7 @@ pub fn get_info() -> Result<(String, String, String, String), Box<dyn std::error
 
 pub fn please_speed_i_need_keys() -> Result<(String, String, String), Box<dyn std::error::Error>> {
     let already_filled =
-        Select::new("Have you already filled these out?", vec!["Yes", "No."]).prompt()?;
+        Select::new("Have you already input your API keys before?", vec!["Yes", "No."]).prompt()?;
 
     let is_filled = match already_filled {
         "Yes" => true,
