@@ -2,7 +2,7 @@ extern crate keyring;
 extern crate inquire;
 
 use keyring::Entry;
-use inquire::{Password, PasswordDisplayMode, Select, SelectPromptAction};
+use inquire::{Password, PasswordDisplayMode, Select, Text};
 
 
 pub enum ApiKeys {
@@ -46,17 +46,18 @@ pub fn get_info() -> Result<(String, String, String), Box<dyn std::error::Error>
         .with_help_message("https://discord.com/developers/applications, make an app and copy the ID")
         .prompt()?;
 
-    let lfm_name = Password::new("What's your name on LastFM?")
-        .with_display_mode(PasswordDisplayMode::Masked)
+    let lfm_name = Text::new("What's your name on LastFM?")
         .prompt()?;
 
-    let steamid64 = Password::new("What's your SteamID64?")
-        .with_display_mode(PasswordDisplayMode::Masked)
+    let steamid64 = Text::new("What's your SteamID64?")
         .with_help_message("Use https://steamid.io/ to get it.")
         .prompt()?;
 
     Ok((appid, lfm_name, steamid64))
 }
+
+
+
 
 pub fn please_speed_i_need_keys() -> Result<(String, String, String), Box<dyn std::error::Error>>{
     let already_filled = Select::new("Have you already filled these out?", vec!["Yes", "No."])
