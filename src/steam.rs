@@ -116,7 +116,7 @@ pub async fn steamdaemon(
         println!("Status {}", dbstatus);
         let dbdata: GridDBResponse = dbresult.json().await?;
 
-        let grid = dbdata.data.get(2).cloned();
+        let grid = dbdata.data.first().cloned();
 
         let large_img_url = grid.unwrap().url;
 
