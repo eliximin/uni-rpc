@@ -19,7 +19,7 @@ pub async fn steamdaemon(
     apikey: &str,
     griddbapi: &str,
 ) -> Result<(), Box<dyn Error>> {
-    let rate = 10; // Every 10 seconds, makes a request. This is made to prevent rate limits because rate limits reek.
+    let rate = 60; // Every 60 seconds, makes a request. This is made to prevent rate limits because rate limits reek.
 
     let mut headers = header::HeaderMap::new();
 
@@ -116,7 +116,7 @@ pub async fn steamdaemon(
         println!("Status {}", dbstatus);
         let dbdata: GridDBResponse = dbresult.json().await?;
 
-        let grid = dbdata.data.get(1).cloned();
+        let grid = dbdata.data.get(2).cloned();
 
         let large_img_url = grid.unwrap().url;
 
@@ -149,7 +149,7 @@ pub async fn steamdaemon(
             }
             _ => {
                 println!("End of steam loop.");
-                continue;
+                break;
             }
         }
     }
