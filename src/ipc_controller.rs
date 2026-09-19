@@ -48,7 +48,7 @@ impl From<IpcType> for ActivityType {
             IpcType::Listening => ActivityType::Listening,
             IpcType::Watching => ActivityType::Watching,
             IpcType::Competing => ActivityType::Competing,
-            _ => ActivityType::Playing
+            _ => ActivityType::Playing,
         }
     }
 }
@@ -76,7 +76,6 @@ impl IPCManager {
     }
 
     pub fn ensure_connected(&mut self) -> Result<&mut DiscordIpcClient, Box<dyn Error>> {
-
         if self.client.is_none() {
             let mut client = DiscordIpcClient::new(&self.app_id);
             client.connect()?;
@@ -110,7 +109,6 @@ impl IPCManager {
         if let Some(a) = &state.activity_type {
             payload = payload.activity_type((*a).into());
         }
-
 
         if state.has_assets() {
             let mut assets = Assets::new();

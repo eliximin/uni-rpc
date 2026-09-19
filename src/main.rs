@@ -20,7 +20,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
     dotenv().ok();
     // let appid = env::var("APP_ID").expect("Missing APP_ID");
 
-
     let (_lastfm_api_key, steam_api_key, griddb_api_key) = config::please_speed_i_need_keys()?;
     let (appid, _lastfm_name, steamid64) = config::get_info()?;
 

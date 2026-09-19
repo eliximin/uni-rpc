@@ -36,7 +36,8 @@ pub async fn steamdaemon(
         .build()?;
 
     loop {
-        let steamurl = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/".to_string();
+        let steamurl =
+            "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/".to_string();
 
         let steamresult = client
             .get(&steamurl)

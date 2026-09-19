@@ -1,16 +1,14 @@
-extern crate keyring;
 extern crate inquire;
+extern crate keyring;
 
-use keyring::Entry;
 use inquire::{Password, PasswordDisplayMode, Select, Text};
-
+use keyring::Entry;
 
 pub enum ApiKeys {
     LastFm,
     Steam,
     GridDB,
 }
-
 
 impl ApiKeys {
     pub fn keyname(&self) -> &'static str {
@@ -39,15 +37,15 @@ pub fn get_secret(key_name: &str) -> Option<String> {
     }
 }
 
-pub fn get_info() -> Result<(String, String, String), Box<dyn std::error::Error>>{
-
+pub fn get_info() -> Result<(String, String, String), Box<dyn std::error::Error>> {
     let appid = Password::new("Discord App ID")
         .with_display_mode(PasswordDisplayMode::Masked)
-        .with_help_message("https://discord.com/developers/applications, make an app and copy the ID")
+        .with_help_message(
+            "https://discord.com/developers/applications, make an app and copy the ID",
+        )
         .prompt()?;
 
-    let lfm_name = Text::new("What's your name on LastFM?")
-        .prompt()?;
+    let lfm_name = Text::new("What's your name on LastFM?").prompt()?;
 
     let steamid64 = Text::new("What's your SteamID64?")
         .with_help_message("Use https://steamid.io/ to get it.")
@@ -56,12 +54,9 @@ pub fn get_info() -> Result<(String, String, String), Box<dyn std::error::Error>
     Ok((appid, lfm_name, steamid64))
 }
 
-
-
-
-pub fn please_speed_i_need_keys() -> Result<(String, String, String), Box<dyn std::error::Error>>{
-    let already_filled = Select::new("Have you already filled these out?", vec!["Yes", "No."])
-        .prompt()?;
+pub fn please_speed_i_need_keys() -> Result<(String, String, String), Box<dyn std::error::Error>> {
+    let already_filled =
+        Select::new("Have you already filled these out?", vec!["Yes", "No."]).prompt()?;
 
     let is_filled = match already_filled {
         "Yes" => true,
@@ -76,7 +71,6 @@ pub fn please_speed_i_need_keys() -> Result<(String, String, String), Box<dyn st
 
         return Ok((lfm_key, steam_key, steamgriddb_key));
     }
-
 
     let lfm_key = Password::new("Last.FM api key")
         .with_display_mode(PasswordDisplayMode::Masked)
