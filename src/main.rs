@@ -5,7 +5,6 @@ extern crate tokio;
 use dotenvy::dotenv;
 use std::boxed::Box;
 use std::error::Error;
-use std::thread::current;
 use tokio::sync::mpsc;
 
 mod config;

@@ -20,7 +20,7 @@ pub async fn lfmdaemon(
     dotenv().ok();
 
     let client = reqwest::Client::builder()
-        .user_agent("UniRPC-ALPHA/0.1 github/eliximin")
+        .user_agent("UniRPC-PRE-ALPHA/0.0.1 github/eliximin")
         .build()?;
 
     loop {
