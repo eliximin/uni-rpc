@@ -56,14 +56,15 @@ pub fn get_info() -> Result<(String, String, String, String), Box<dyn std::error
         .with_help_message("Use https://steamid.io/ to get it.")
         .prompt()?;
 
-
-
     Ok((appid, lfm_name, steamid64, current_session.to_string()))
 }
 
 pub fn please_speed_i_need_keys() -> Result<(String, String, String), Box<dyn std::error::Error>> {
-    let already_filled =
-        Select::new("Have you already input your API keys before?", vec!["Yes", "No."]).prompt()?;
+    let already_filled = Select::new(
+        "Have you already input your API keys before?",
+        vec!["Yes", "No."],
+    )
+    .prompt()?;
 
     let is_filled = match already_filled {
         "Yes" => true,

@@ -12,8 +12,8 @@ mod ipc_controller;
 mod lastfm;
 mod steam;
 use crate::ipc_controller::ActivityMetadata;
-use crate::steam::steamdaemon;
 use crate::lastfm::lfmdaemon;
+use crate::steam::steamdaemon;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -74,7 +74,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
             }
         });
     }
-
 
     // Due for a large refactor, honestly... I'll have to use startdaemon to supply this main script with assets and such. I'll branch the actual RPC module into a different script later.
 
