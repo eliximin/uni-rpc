@@ -21,7 +21,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // let appid = env::var("APP_ID").expect("Missing APP_ID");
 
     let (lastfm_api_key, steam_api_key, griddb_api_key) = config::please_speed_i_need_keys()?;
-    let (appid, lastfm_name, steamid64, current_session) = config::get_info()?;
+    let (lastfm_name, steamid64, current_session) = config::get_info()?;
+    let appid = "1544446366795964496";
 
     // let steam_api_key = env::var("STEAM_API").expect("Missing STEAM_API");
     // let steamid64 = env::var("STEAMID64").expect("Missing STEAMID64");
