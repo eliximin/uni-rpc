@@ -1,8 +1,12 @@
 extern crate inquire;
 extern crate keyring;
 
+use std::{error::Error, thread::current};
+
 use inquire::{Password, PasswordDisplayMode, Select, Text};
 use keyring::Entry;
+
+use serde::{Serialize, Deserialize};
 
 pub enum ApiKeys {
     LastFm,
@@ -37,18 +41,29 @@ pub fn get_secret(key_name: &str) -> Option<String> {
     }
 }
 
-pub fn get_info() -> Result<(String, String, String, String), Box<dyn std::error::Error>> {
-    let appid = Password::new("Discord App ID")
-        .with_display_mode(PasswordDisplayMode::Masked)
-        .with_help_message(
-            "https://discord.com/developers/applications, make an app and copy the ID",
-        )
-        .prompt()?;
+pub fn get_info() -> Result<(String, String, String), Box<dyn std::error::Error>> {
 
     let current_session =
         Select::new("LastFM or Steam?", vec!["LastFM", "Steam"])
-            .with_help_message("I'm too lazy to actually stop you from filling out either of those fields, so just don't fill out Steam-related ones if you pick LastFM. And vice-versa.")
+            .with_help_message("This'll be phased out eventually.")
             .prompt()?;
+
+    let already_filled = Select::new(
+        "Did you already provide your SteamID64 and Last.FM username?",
+        vec!["Yes, skip this.", "No, let me refill them."],
+    )
+    .prompt()?;
+
+    let is_filled = match already_filled {
+        "Yes, skip this." => true,
+        "No, let me refill them." => false,
+        _ => unreachable!(),
+    };
+
+    if is_filled {
+        let current_cfg: ReqInfo = confy::load("uni-rpc", None)?;
+        return Ok((current_cfg.lastfm_name, current_cfg.steamid64, current_session.to_string()))
+    }
 
     let lfm_name = Text::new("What's your name on LastFM?").prompt()?;
 
@@ -56,10 +71,19 @@ pub fn get_info() -> Result<(String, String, String, String), Box<dyn std::error
         .with_help_message("Use https://steamid.io/ to get it.")
         .prompt()?;
 
-    Ok((appid, lfm_name, steamid64, current_session.to_string()))
+
+
+    let new_cfg = ReqInfo {
+        lastfm_name: lfm_name.clone(),
+        steamid64: steamid64.clone()
+    };
+
+    confy::store("uni-rpc", None, new_cfg)?;
+
+    Ok((lfm_name, steamid64, current_session.to_string()))
 }
 
-pub fn please_speed_i_need_keys() -> Result<(String, String, String), Box<dyn std::error::Error>> {
+pub fn please_speed_i_need_keys() -> Result<(String, String, String), Box<dyn Error>> {
     let already_filled = Select::new(
         "Have you already input your API keys before?",
         vec!["Yes", "No."],
@@ -82,14 +106,14 @@ pub fn please_speed_i_need_keys() -> Result<(String, String, String), Box<dyn st
 
     let lfm_key = Password::new("Last.FM api key")
         .with_display_mode(PasswordDisplayMode::Masked)
-        .with_help_message("you also need the other 2 api keys for steam and steamgriddb")
+        .with_help_message("Sign into last.fm and create an API key at https://www.last.fm/api/account/create")
         .prompt()?;
 
-    let steam_key = Password::new("Steam api key")
+    let steam_key = Password::new("Sign into Steam and head to https://steamcommunity.com/dev/apikey to creat an API key.")
         .with_display_mode(PasswordDisplayMode::Masked)
         .prompt()?;
 
-    let steamgriddb_key = Password::new("Steamgriddb api key")
+    let steamgriddb_key = Password::new("Head to steamgriddb.com, sign in, and make an API key over at https://www.steamgriddb.com/profile/preferences/api")
         .with_display_mode(PasswordDisplayMode::Masked)
         .prompt()?;
 
@@ -98,4 +122,11 @@ pub fn please_speed_i_need_keys() -> Result<(String, String, String), Box<dyn st
     set_secret(ApiKeys::GridDB.keyname(), &steamgriddb_key)?;
 
     Ok((lfm_key, steam_key, steamgriddb_key))
+}
+
+
+#[derive(Default, Debug, Serialize, Deserialize)]
+struct ReqInfo {
+    lastfm_name: String,
+    steamid64: String,
 }
