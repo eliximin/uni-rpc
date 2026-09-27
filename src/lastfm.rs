@@ -55,6 +55,7 @@ pub async fn lfmdaemon(
             .map(|img| &img.url);
 
         let state = ActivityMetadata {
+            src: "lastfm".to_string(),
             activity_type: Some(IpcType::Listening),
             name: Some(current_track.artist.name.clone()),
             details: current_track.name.clone(),

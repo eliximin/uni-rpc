@@ -110,14 +110,14 @@ pub async fn steamdaemon(
 
         let gameid = unwrappeduser.gameid.clone();
 
-        let dburl = format!("https://www.steamgriddb.com/api/v2/icons/steam/{gameid}");
+        let dburl = format!("https://www.steamgriddb.com/api/v2/grids/steam/{gameid}");
 
         let dbresult = client.get(&dburl).send().await?;
         let dbstatus = dbresult.status();
         println!("Status {}", dbstatus);
         let dbdata: GridDBResponse = dbresult.json().await?;
 
-        let grid = dbdata.data.first().cloned();
+        let grid = dbdata.data.get(1).cloned();
 
         let large_img_url = grid.unwrap().url;
 
@@ -128,6 +128,7 @@ pub async fn steamdaemon(
         }
 
         let state = ActivityMetadata {
+            src: "steam".to_string(),
             activity_type: Some(IpcType::Playing),
             name: unwrappeduser.gamedetails,
             details: None,
