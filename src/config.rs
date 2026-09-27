@@ -6,7 +6,7 @@ use std::{error::Error, thread::current};
 use inquire::{Password, PasswordDisplayMode, Select, Text};
 use keyring::Entry;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 pub enum ApiKeys {
     LastFm,
@@ -42,11 +42,9 @@ pub fn get_secret(key_name: &str) -> Option<String> {
 }
 
 pub fn get_info() -> Result<(String, String, String), Box<dyn std::error::Error>> {
-
-    let current_session =
-        Select::new("LastFM or Steam?", vec!["LastFM", "Steam"])
-            .with_help_message("This'll be phased out eventually.")
-            .prompt()?;
+    let current_session = Select::new("LastFM or Steam?", vec!["LastFM", "Steam"])
+        .with_help_message("This'll be phased out eventually.")
+        .prompt()?;
 
     let already_filled = Select::new(
         "Did you already provide your SteamID64 and Last.FM username?",
@@ -62,7 +60,11 @@ pub fn get_info() -> Result<(String, String, String), Box<dyn std::error::Error>
 
     if is_filled {
         let current_cfg: ReqInfo = confy::load("uni-rpc", None)?;
-        return Ok((current_cfg.lastfm_name, current_cfg.steamid64, current_session.to_string()))
+        return Ok((
+            current_cfg.lastfm_name,
+            current_cfg.steamid64,
+            current_session.to_string(),
+        ));
     }
 
     let lfm_name = Text::new("What's your username on LastFM?").prompt()?;
@@ -71,11 +73,9 @@ pub fn get_info() -> Result<(String, String, String), Box<dyn std::error::Error>
         .with_help_message("Use https://steamid.io/ to get it.")
         .prompt()?;
 
-
-
     let new_cfg = ReqInfo {
         lastfm_name: lfm_name.clone(),
-        steamid64: steamid64.clone()
+        steamid64: steamid64.clone(),
     };
 
     confy::store("uni-rpc", None, new_cfg)?;
@@ -106,12 +106,16 @@ pub fn please_speed_i_need_keys() -> Result<(String, String, String), Box<dyn Er
 
     let lfm_key = Password::new("Last.FM api key")
         .with_display_mode(PasswordDisplayMode::Masked)
-        .with_help_message("Sign into last.fm and create an API key at https://www.last.fm/api/account/create")
+        .with_help_message(
+            "Sign into last.fm and create an API key at https://www.last.fm/api/account/create",
+        )
         .prompt()?;
 
-    let steam_key = Password::new("Sign into Steam and head to https://steamcommunity.com/dev/apikey to creat an API key.")
-        .with_display_mode(PasswordDisplayMode::Masked)
-        .prompt()?;
+    let steam_key = Password::new(
+        "Sign into Steam and head to https://steamcommunity.com/dev/apikey to creat an API key.",
+    )
+    .with_display_mode(PasswordDisplayMode::Masked)
+    .prompt()?;
 
     let steamgriddb_key = Password::new("Head to steamgriddb.com, sign in, and make an API key over at https://www.steamgriddb.com/profile/preferences/api")
         .with_display_mode(PasswordDisplayMode::Masked)
@@ -123,7 +127,6 @@ pub fn please_speed_i_need_keys() -> Result<(String, String, String), Box<dyn Er
 
     Ok((lfm_key, steam_key, steamgriddb_key))
 }
-
 
 #[derive(Default, Debug, Serialize, Deserialize)]
 struct ReqInfo {
