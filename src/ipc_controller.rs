@@ -21,6 +21,7 @@ pub fn setup() -> Result<(), Box<dyn Error>> {
 
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct ActivityMetadata {
+    pub src: String,
     pub activity_type: Option<IpcType>,
     pub name: Option<String>, // App title
     pub details: Option<String>,
