@@ -54,7 +54,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let lastfm_api_key = lastfm_api_key.clone();
 
         tokio::spawn(async move {
-            println!("Luh fm");
             if let Err(e) = lfmdaemon(lfm_tx, &lastfm_name, &lastfm_api_key).await {
                 eprintln!("Oops: {:?}", e);
             }
