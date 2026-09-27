@@ -33,7 +33,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let (tx, mut rx) = mpsc::channel::<ActivityMetadata>(32);
 
     tokio::spawn(async move {
-        let mut rpc_mgr = ipc_controller::IPCManager::new(&appid);
+        let mut rpc_mgr = ipc_controller::IPCManager::new(appid);
 
         let _ = rpc_mgr.ensure_connected();
 

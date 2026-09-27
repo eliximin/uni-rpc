@@ -1,7 +1,7 @@
 extern crate inquire;
 extern crate keyring;
 
-use std::{error::Error, thread::current};
+use std::error::Error;
 
 use inquire::{Password, PasswordDisplayMode, Select, Text};
 use keyring::Entry;
