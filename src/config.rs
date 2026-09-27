@@ -65,7 +65,7 @@ pub fn get_info() -> Result<(String, String, String), Box<dyn std::error::Error>
         return Ok((current_cfg.lastfm_name, current_cfg.steamid64, current_session.to_string()))
     }
 
-    let lfm_name = Text::new("What's your name on LastFM?").prompt()?;
+    let lfm_name = Text::new("What's your username on LastFM?").prompt()?;
 
     let steamid64 = Text::new("What's your SteamID64?")
         .with_help_message("Use https://steamid.io/ to get it.")
