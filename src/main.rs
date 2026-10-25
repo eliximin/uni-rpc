@@ -17,7 +17,6 @@ use crate::steam::steamdaemon;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    dotenv().ok();
     // let appid = env::var("APP_ID").expect("Missing APP_ID");
 
     let (lastfm_api_key, steam_api_key, griddb_api_key) = config::please_speed_i_need_keys()?;
@@ -74,8 +73,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
             }
         });
     }
-
-    // Due for a large refactor, honestly... I'll have to use startdaemon to supply this main script with assets and such. I'll branch the actual RPC module into a different script later.
 
     tokio::signal::ctrl_c().await?;
     println!("shutdown");
