@@ -85,23 +85,6 @@ pub fn get_info() -> Result<(String, String, String), Box<dyn std::error::Error>
     Ok((lfm_name, steamid64, current_session.to_string()))
 }
 
-pub fn init_variables() -> Result<i32, Box<dyn Error>> {
-    let os = std::env::consts::OS;
-    let user = std::env::var("USER")
-        .or_else(|_| std::env::var("UserName"))
-        .unwrap_or_else(|_| "Unknown".to_string());
-
-    let path = match os {
-        "windows" => "%appdata%\\eliximin\\unirpc",
-        "linux" => "/home/USERNAME/.config/uni-rpc",
-        _ => panic!("Unsupported...")
-    };
-
-
-
-    Ok((5))
-}
-
 
 pub fn please_speed_i_need_keys() -> Result<(String, String, String), Box<dyn Error>> {
     let already_filled = Select::new(
