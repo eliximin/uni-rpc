@@ -86,6 +86,48 @@ pub fn get_info() -> Result<(String, String, String), Box<dyn std::error::Error>
 }
 
 
+// pub fn get_vars() -> Result<(String, String), Box<dyn std::error::Error>> {
+//     let current_session = Select::new("LastFM or Steam?", vec!["LastFM", "Steam"])
+//         .with_help_message("This'll be phased out eventually.")
+//         .prompt()?;
+
+//     let already_filled = Select::new(
+//         "Do you want to edit your RPC variables?",
+//         vec!["No, skip this.", "Yes, let me edit them."],
+//     )
+//     .prompt()?;
+
+//     let is_filled = match already_filled {
+//         "No, skip this." => true,
+//         "Yes, let me refill them." => false,
+//         _ => unreachable!(),
+//     };
+
+//     if is_filled {
+//         let current_cfg: ReqInfo = confy::load("uni-rpc", None)?;
+//         return Ok((
+//             current_cfg.activity,
+//             current_session.to_string(),
+//         ));
+//     }
+
+//     let lfm_name = Text::new("What's your username on LastFM?").prompt()?;
+
+//     let steamid64 = Text::new("What's your SteamID64?")
+//         .with_help_message("Use https://steamid.io/ to get it.")
+//         .prompt()?;
+
+//     let new_cfg = ReqInfo {
+//         activity: activity.clone(),
+//         steamid64: steamid64.clone(),
+//     };
+
+//     confy::store("uni-rpc", None, new_cfg)?;
+
+//     Ok((activity, current_session.to_string()))
+// }
+
+
 pub fn please_speed_i_need_keys() -> Result<(String, String, String), Box<dyn Error>> {
     let already_filled = Select::new(
         "Have you already input your API keys before?",
