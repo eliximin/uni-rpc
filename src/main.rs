@@ -2,7 +2,6 @@ extern crate discord_rich_presence;
 extern crate dotenvy;
 extern crate tokio;
 
-use dotenvy::dotenv;
 use std::boxed::Box;
 use std::error::Error;
 use tokio::sync::mpsc;
@@ -13,14 +12,13 @@ mod lastfm;
 mod steam;
 use crate::ipc_controller::ActivityMetadata;
 use crate::lastfm::lfmdaemon;
-use crate::steam::steamdaemon;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     // let appid = env::var("APP_ID").expect("Missing APP_ID");
 
-    let (lastfm_api_key, steam_api_key, griddb_api_key) = config::please_speed_i_need_keys()?;
-    let (lastfm_name, steamid64, current_session) = config::get_info()?;
+    let (lastfm_api_key, _steam_api_key, _griddb_api_key) = config::please_speed_i_need_keys()?;
+    let (lastfm_name, _steamid64, _current_session) = config::get_info()?;
     let appid = "1544446366795964496";
 
     // let steam_api_key = env::var("STEAM_API").expect("Missing STEAM_API");
@@ -31,12 +29,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let (tx, mut rx) = mpsc::channel::<ActivityMetadata>(32);
 
-
     let ogstruct = config::get_vars();
-    let variable_list: ActivityMetadata = serde_json::from_str(&ogstruct.unwrap().variables).unwrap();
+    let variable_list: ActivityMetadata =
+        serde_json::from_str(&ogstruct.unwrap().variables).unwrap();
 
-    println!("hi this is the config ig: {:?}", &variable_list);
-
+    println!("hi this is the config ig: {:?}", variable_list);
 
     tokio::spawn(async move {
         let mut rpc_mgr = ipc_controller::IPCManager::new(appid);
@@ -66,7 +63,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
         }
     });
 
-
     // println!("Running in Steam mode!");
     // let steam_tx = tx.clone();
     // let steamid = steamid64.clone();
@@ -78,7 +74,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
     //         eprintln!("Oops: {:?}", e);
     //     }
     // });
-
 
     tokio::signal::ctrl_c().await?;
     println!("shutdown");

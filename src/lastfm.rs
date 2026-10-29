@@ -65,7 +65,7 @@ pub async fn lfmdaemon(
             large_url: current_track.url.clone(),
             small_image: Some("https://i.ibb.co/1t50cMJG/horror.png".to_string()),
             small_text: Some("with uni-rpc!".to_string()),
-            small_url: None
+            small_url: None,
         };
 
         println!("Status: {}", status);

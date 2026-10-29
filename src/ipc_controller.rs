@@ -64,7 +64,6 @@ impl ActivityMetadata {
     }
 }
 
-
 pub struct IPCManager {
     client: Option<DiscordIpcClient>,
     app_id: String,
@@ -130,8 +129,7 @@ impl IPCManager {
             payload = payload.assets(assets);
         }
 
-
-        let result = client.set_activity(payload);
+        let _result = client.set_activity(payload);
         Ok(())
     }
 }

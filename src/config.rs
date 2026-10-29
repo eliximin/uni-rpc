@@ -1,7 +1,7 @@
 extern crate inquire;
 extern crate keyring;
 
-use std::{error::Error, range::Range};
+use std::error::Error;
 
 use inquire::{Password, PasswordDisplayMode, Select, Text};
 use keyring::Entry;
@@ -85,14 +85,14 @@ pub fn get_info() -> Result<(String, String, String), Box<dyn std::error::Error>
     Ok((lfm_name, steamid64, current_session.to_string()))
 }
 
-
-pub fn get_vars() -> Result<(Variables), Box<dyn std::error::Error>> {
-
+pub fn get_vars() -> Result<Variables, Box<dyn std::error::Error>> {
     let already_filled = Select::new(
         "Do you want to edit your RPC variables?",
         vec!["No, skip this.", "Yes, let me edit them."],
     )
-    .with_help_message("This will.. reset your entire variable config. You'll have to redo this again.")
+    .with_help_message(
+        "This will.. reset your entire variable config. You'll have to redo this again.",
+    )
     .prompt()?;
 
     let is_filled = match already_filled {
@@ -103,15 +103,15 @@ pub fn get_vars() -> Result<(Variables), Box<dyn std::error::Error>> {
 
     if is_filled {
         let current_cfg: Variables = confy::load("uni-rpc", "variables")?;
-        return Ok(
-            current_cfg
-        );
+        return Ok(current_cfg);
     }
 
-
-    let activity = Select::new("What do you want to set the activity type as?", vec!["Playing", "Watching", "Listening", "Competing"])
-        .with_help_message("I'm sure this needs no explanation.")
-        .prompt()?;
+    let activity = Select::new(
+        "What do you want to set the activity type as?",
+        vec!["Playing", "Watching", "Listening", "Competing"],
+    )
+    .with_help_message("I'm sure this needs no explanation.")
+    .prompt()?;
 
     let activitytype = match activity {
         "Playing" => IpcType::Playing,
@@ -164,15 +164,13 @@ pub fn get_vars() -> Result<(Variables), Box<dyn std::error::Error>> {
     };
 
     let var_js = Variables {
-        variables: serde_json::to_string(&full).unwrap()
+        variables: serde_json::to_string(&full).unwrap(),
     };
-
 
     confy::store("hhh", "variables", &var_js)?;
 
     Ok(var_js)
 }
-
 
 pub fn please_speed_i_need_keys() -> Result<(String, String, String), Box<dyn Error>> {
     let already_filled = Select::new(
