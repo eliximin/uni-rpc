@@ -130,11 +130,8 @@ impl IPCManager {
             payload = payload.assets(assets);
         }
 
-        println!("result inscoming");
-        println!("payload {:?}", &state);
 
         let result = client.set_activity(payload);
-        println!("result {:?}", result);
         Ok(())
     }
 }

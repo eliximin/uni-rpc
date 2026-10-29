@@ -49,7 +49,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
             // hi this will have to change and state will have to inherit from config and replace as it sees fit
             // im glad i already defined that whole activitymetadata thing...
             if let Err(e) = rpc_mgr.update_presence(&variable_list) {
-                println!("Hi");
                 eprintln!("ipc errored: {e}");
                 rpc_mgr.handle_disconnect();
             }
