@@ -5,6 +5,7 @@ extern crate tokio;
 use discord_rich_presence::activity::ActivityType;
 use discord_rich_presence::{DiscordIpc, DiscordIpcClient, activity::Activity, activity::Assets};
 use dotenvy::dotenv;
+use serde::{Deserialize, Serialize};
 use std::boxed::Box;
 use std::env;
 use std::error::Error;
@@ -19,7 +20,7 @@ pub fn setup() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct ActivityMetadata {
     pub src: String,
     pub activity_type: Option<IpcType>,
@@ -34,14 +35,14 @@ pub struct ActivityMetadata {
     pub small_url: Option<String>,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum IpcType {
     Playing = 0,
     Listening = 1,
     Watching = 2,
     Competing = 3,
-} // i have to test these to confirm these are accurate
+}
 impl From<IpcType> for ActivityType {
     fn from(ipc_type: IpcType) -> Self {
         match ipc_type {
@@ -62,6 +63,7 @@ impl ActivityMetadata {
             || self.small_text.is_some()
     }
 }
+
 
 pub struct IPCManager {
     client: Option<DiscordIpcClient>,
@@ -128,7 +130,11 @@ impl IPCManager {
             payload = payload.assets(assets);
         }
 
-        client.set_activity(payload)?;
+        println!("result inscoming");
+        println!("payload {:?}", &state);
+
+        let result = client.set_activity(payload);
+        println!("result {:?}", result);
         Ok(())
     }
 }

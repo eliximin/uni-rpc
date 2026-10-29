@@ -32,6 +32,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let (tx, mut rx) = mpsc::channel::<ActivityMetadata>(32);
 
 
+    let ogstruct = config::get_vars();
+    let variable_list: ActivityMetadata = serde_json::from_str(&ogstruct.unwrap().variables).unwrap();
+
+    println!("hi this is the config ig: {:?}", &variable_list);
+
+
     tokio::spawn(async move {
         let mut rpc_mgr = ipc_controller::IPCManager::new(appid);
 
@@ -40,40 +46,40 @@ async fn main() -> Result<(), Box<dyn Error>> {
         while let Some(state) = rx.recv().await {
             println!("received update: {:?}", state.name);
 
-            if let Err(e) = rpc_mgr.update_presence(&state) {
+            // hi this will have to change and state will have to inherit from config and replace as it sees fit
+            // im glad i already defined that whole activitymetadata thing...
+            if let Err(e) = rpc_mgr.update_presence(&variable_list) {
+                println!("Hi");
                 eprintln!("ipc errored: {e}");
                 rpc_mgr.handle_disconnect();
             }
         }
     });
-    if current_session == "LastFM" {
-        println!("Running in LastFM mode!");
-        let lfm_tx = tx.clone();
 
-        let lastfm_name = lastfm_name.clone();
-        let lastfm_api_key = lastfm_api_key.clone();
+    println!("Running in LastFM mode!");
+    let lfm_tx = tx.clone();
+    let lastfm_name = lastfm_name.clone();
+    let lastfm_api_key = lastfm_api_key.clone();
 
-        tokio::spawn(async move {
-            if let Err(e) = lfmdaemon(lfm_tx, &lastfm_name, &lastfm_api_key).await {
-                eprintln!("Oops: {:?}", e);
-            }
-        });
-    }
+    tokio::spawn(async move {
+        if let Err(e) = lfmdaemon(lfm_tx, &lastfm_name, &lastfm_api_key).await {
+            eprintln!("Oops: {:?}", e);
+        }
+    });
 
-    if current_session == "Steam" {
-        println!("Running in Steam mode!");
-        let steam_tx = tx.clone();
 
-        let steamid = steamid64.clone();
-        let steamapikey = steam_api_key.clone();
-        let griddbapi = griddb_api_key;
+    // println!("Running in Steam mode!");
+    // let steam_tx = tx.clone();
+    // let steamid = steamid64.clone();
+    // let steamapikey = steam_api_key.clone();
+    // let griddbapi = griddb_api_key;
 
-        tokio::spawn(async move {
-            if let Err(e) = steamdaemon(steam_tx, &steamid, &steamapikey, &griddbapi).await {
-                eprintln!("Oops: {:?}", e);
-            }
-        });
-    }
+    // tokio::spawn(async move {
+    //     if let Err(e) = steamdaemon(steam_tx, &steamid, &steamapikey, &griddbapi).await {
+    //         eprintln!("Oops: {:?}", e);
+    //     }
+    // });
+
 
     tokio::signal::ctrl_c().await?;
     println!("shutdown");
